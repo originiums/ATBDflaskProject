@@ -92,6 +92,40 @@ def time_range_data():
     # 渲染html模板
     return (j)
 
+@app.route("/planeMap/map", methods=['POST'])
+def map_line_data():
+    data = json.loads(request.form.get('data'))
+    start_area = data['start_area']
+    end_area = data['end_area']
+    act_date = data['act_date']
+    # print(start_area, end_area, act_date)
+
+    conn = pymysql.connect(host='127.0.0.1', user='root', password='', db='buggerexe')  # 建立数据库连接
+    cur = conn.cursor()
+    sql = "SELECT start_area, end_area FROM time_sum " \
+          "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
+          "GROUP BY start_area, end_area" % (start_area, end_area, act_date)  # sql语句
+    print(sql)
+    cur.execute(sql)  # execute(query, args):执行单条sql语句。
+    see = cur.fetchall()  # 使结果全部可看
+    sta = []
+    jsonData = {}
+    eda = []
+
+    for data in see:
+        sta.append(data[0])
+        eda.append(data[1])
+
+    jsonData['sta'] = sta
+    jsonData['eda'] = eda
+    # print(jsonData)
+    # 将json格式转成str，因为如果直接将dict类型的数据写入json会发生报错，因此将数据写入时需要用到该函数。
+    j = json.dumps(jsonData, cls=DecimalEncoder, ensure_ascii=False)
+    # print(j)
+    cur.close()
+    conn.close()
+    # 渲染html模板
+    return (j)
 
 if __name__ == '__main__':
     app.run(debug=True)  # 启用调试模式

@@ -259,6 +259,7 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                   var tmp = { value: app.yvalue[j], name: app.xday[j] };
                   time_datas[j] = tmp;
                 }
+                //alert(time_datas);
                 option = {
                   tooltip: {
                     trigger: "item",
