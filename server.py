@@ -21,29 +21,30 @@ class DecimalEncoder(json.JSONEncoder):
 
 @app.route("/")
 def my_echart():
-    conn = pymysql.connect(host='127.0.0.1', user='root', password='', db='buggerexe')  # 建立数据库连接
-    cur = conn.cursor()
-    sqlmale = ' SELECT count(*) FROM  greatri where zl >= 1000 '
-    sqlfemale = ' SELECT count(*) FROM  greatri where zl < 1000'
-    sqls = ' SELECT zl FROM  greatri '
-    cur.execute(sqlmale)  # 执行单条sql语句
-    maleresult = cur.fetchall()  # 接收全部的返回结果行
-    cur.execute(sqlfemale)
-    femaleresult = cur.fetchall()
-    cur.execute(sqls)
-    results = cur.fetchall()
-    male_num = maleresult[0][0]
-    female_num = femaleresult[0][0]
-    num1 = []
-    for result in results:
-        num1.append(result[0])
-    cur.close()  # 关闭指针对象
-    conn.close()  # 关闭连接对象
-    # print(male_num)#测试
-    # print(female_num)
-    # print(num1)
-    return render_template('bar.html', male_num=male_num, female_num=female_num,
-                           num1=num1)  # 先引入bar.html，同时根据后面传入的参数，对html进行修改渲染
+    return render_template('login.html')
+    # conn = pymysql.connect(host='127.0.0.1', user='root', password='', db='buggerexe')  # 建立数据库连接
+    # cur = conn.cursor()
+    # sqlmale = ' SELECT count(*) FROM  greatri where zl >= 1000 '
+    # sqlfemale = ' SELECT count(*) FROM  greatri where zl < 1000'
+    # sqls = ' SELECT zl FROM  greatri '
+    # cur.execute(sqlmale)  # 执行单条sql语句
+    # maleresult = cur.fetchall()  # 接收全部的返回结果行
+    # cur.execute(sqlfemale)
+    # femaleresult = cur.fetchall()
+    # cur.execute(sqls)
+    # results = cur.fetchall()
+    # male_num = maleresult[0][0]
+    # female_num = femaleresult[0][0]
+    # num1 = []
+    # for result in results:
+    #     num1.append(result[0])
+    # cur.close()  # 关闭指针对象
+    # conn.close()  # 关闭连接对象
+    # # print(male_num)#测试
+    # # print(female_num)
+    # # print(num1)
+    # return render_template('bar.html', male_num=male_num, female_num=female_num,
+    #                        num1=num1)  # 先引入bar.html，同时根据后面传入的参数，对html进行修改渲染
 
 
 @app.route("/planeMap")
