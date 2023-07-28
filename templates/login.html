@@ -198,7 +198,7 @@
             <input id="acd" type="text">
             <label for="">出发日期</label>
         </div>
-        <button class="btn" onclick="login()">查询
+        <button class="btn" onclick="login()" type="button">查询
             <span></span>
             <span></span>
             <span></span>
@@ -213,14 +213,15 @@
         var sta = document.getElementById('sta').value;
         var eda = document.getElementById('eda').value;
         var acd = document.getElementById('acd').value;
-        alert(sta);
+        console.log(sta);
         if (username == 'admin' && password == '123456') {
-            if(sta != "" && eda != "" && acd != ""){
+            if(1{#sta != "" && eda != "" && acd != ""#}){
                 window.location.href = "planeMap/" + sta + "/" + eda + "/" +acd;
-                window.event.returnValue=false;
+                //window.event.returnValue=false;
+            }else {
+                window.location.replace("planeMap");
+                //window.event.returnValue=false;
             }
-            window.location.href = "planeMap";
-            window.event.returnValue=false;
         } else {
             alert('用户名或密码错误');
         }

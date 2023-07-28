@@ -210,10 +210,10 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                     return res;
                 };
 
-                var color = ["#fff", "#fff", "#fff"]; //航线的颜色
+                var color = ["#fff", "#fff", "#fff","#fff"]; //航线的颜色
                 var series = [];
                 [
-                    ["西安", XAData]/*,
+                    ["成都", XAData]/*,
                     ["西宁", XNData],
                     ["银川", YCData]*/
                 ].forEach(function (item, i) {
@@ -293,6 +293,39 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                                     value: geoCoordMap[dataItem[1].name].concat([dataItem[1].value])
                                 };
                             })
+                        },
+                        {
+                            name: item[0] + " Top3",
+                            type: "effectScatter",
+                            coordinateSystem: "geo",
+                            zlevel: 2,
+                            rippleEffect: {
+                                brushType: "stroke"
+                            },
+                            label: {
+                                normal: {
+                                    show: true,
+                                    position: "right",
+                                    formatter: "{b}"
+                                }
+                            },
+                            symbolSize: function (val) {
+                                return val[2] / 8;
+                            },
+                            itemStyle: {
+                                normal: {
+                                    color: color[i]
+                                },
+                                emphasis: {
+                                    areaColor: "#2B91B7"
+                                }
+                            },
+                            data: item[1].map(function (dataItem) {
+                                return {
+                                    name: dataItem[0].name,
+                                    value: geoCoordMap[dataItem[0].name].concat([dataItem[1].value])
+                                };
+                            })
                         }
                     );
                 });
@@ -324,9 +357,9 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                                 color: "#fff"
                             }
                         },
-                        roam: false,
+                        roam: true,
                         //   放大我们的地图
-                        zoom: 1,
+                        zoom: 1.2,
                         itemStyle: {
                             normal: {
                                 areaColor: "rgba(43, 196, 243, 0.42)",
