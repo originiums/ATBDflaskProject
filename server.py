@@ -49,11 +49,11 @@ def my_echart():
 
 @app.route("/planeMap")
 def show_da1():
-    return redirect(url_for('show_datas', start='%', date='%', end='%'))
+    return redirect(url_for('show_datas', start='%', date='2023-08-08', end='%'))
 
 
 @app.route("/planeMap/<start>/<end>/<date>")
-def show_datas(start='%', date='%', end='%'):
+def show_datas(start='%', date='2023-08-08', end='%'):
     print(start, date, end)
     return render_template('index.html', start=start, end=end, date=date)
 
