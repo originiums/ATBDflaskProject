@@ -8,16 +8,16 @@ var act_date = document.getElementById('indataid').getAttribute('d');
 
     var app = {
         xaxis: [],
-        yvalue1: [],
-        yvalue2: []
+        yvalues1: [],
+        yvalues2: []
     };
 
     //发送ajax请求
     $(document).ready(function () {
         getData();
         console.log(app.xaxis);
-        console.log(app.yvalue1);
-        console.log(app.yvalue2);
+        console.log(app.yvalues1);
+        console.log(app.yvalues2);
     });
     var data = {
         data: JSON.stringify({
@@ -38,8 +38,8 @@ var act_date = document.getElementById('indataid').getAttribute('d');
             success: function (data) {
 
                 app.xaxis = data.xaxis;
-                app.yvalue1 = data.yvalues1;
-                app.yvalue2 = data.yvalues2;
+                app.yvalues1 = data.yvalues1;
+                app.yvalues2 = data.yvalues2;
 
                 var option = {
                     color: ["#2f89cf"],
@@ -103,7 +103,7 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                             name: "价格区间",
                             type: "bar",
                             barWidth: "35%",
-                            data: app.yvalue1,
+                            data: app.yvalues1,
                             itemStyle: {
                                 barBorderRadius: 5
                             }
@@ -119,8 +119,8 @@ var act_date = document.getElementById('indataid').getAttribute('d');
 
                 // 数据变化
                 var dataAll = [
-                    {year: "当日", data: app.yvalue1},
-                    {year: "明日", data: app.yvalue2}
+                    {year: "当日", data: app.yvalues1},
+                    {year: "明日", data: app.yvalues2}
                 ];
 
                 $(".bar h2 ").on("click", "a", function () {
@@ -142,210 +142,252 @@ var act_date = document.getElementById('indataid').getAttribute('d');
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.querySelector(".line .chart"));
 
-    let dataAxis = ['C10001', 'C10002', 'C10003', '子', '或', '者', '两', '指', '在', '触', '屏', '上', '滑', '动', '能', '够', '自', '动', '缩', '放'];
-    // prettier-ignore
-    let data = [220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125, 220];
-    let yMax = 500;
-    let dataShadow = [];
-    for (let i = 0; i < data.length; i++) {
-        dataShadow.push(yMax);
+    var app = {
+        xaxis: [],
+        yvalues1: [],
+    };
+
+    //发送ajax请求
+    $(document).ready(function () {
+        getData();
+        console.log(app.xaxis);
+        console.log(app.yvalues1);
+    });
+    var data = {
+        data: JSON.stringify({
+            'start_area': start_area,
+            'end_area': end_area,
+            'act_date': act_date
+        }),
     }
-    option = {
-        tooltip: {
-            trigger: "axis",
-            axisPointer: {
-                // 坐标轴指示器，坐标轴触发有效
-                type: "line" // 默认为直线，可选为：'line' | 'shadow'
-            }
-        },
-        /*title: {
-            text: '特性示例：渐变色 阴影 点击缩放',
-            subtext: 'Feature Sample: Gradient Color, Shadow, Click Zoom'
-        },*/
-        grid: {
-            left: "0%",
-            top: "10px",
-            right: "0%",
-            bottom: "4%",
-            containLabel: true
-        },
-        xAxis: {
-            data: dataAxis,
-            axisLabel: {
-                inside: true,
-                color: '#fff'
-            },
-            axisTick: {
-                show: false
-            },
-            axisLine: {
-                show: false
-            },
-            z: 10
-        },
-        yAxis: {
-            axisLine: {
-                show: false
-            },
-            axisTick: {
-                show: false
-            },
-            axisLabel: {
-                color: '#999'
-            }
-        },
-        dataZoom: [
-            {
-                type: 'inside'
-            }
-        ],
-        series: [
-            {
-                name: '晚点/取消率',
-                type: 'bar',
-                showBackground: true,
-                itemStyle: {
-                    barBorderRadius: 4,
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        {offset: 0, color: 'rgb(232,191,205)'},
-                        {offset: 0.5, color: 'rgb(204,147,197)'},
-                        {offset: 1, color: '#188df0'}
-                    ])
-                },
-                emphasis: {
 
-                    itemStyle: {
-                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                            {offset: 0, color: '#2378f7'},
-                            {offset: 0.7, color: 'rgb(204,147,197)'},
-                            {offset: 1, color: 'rgb(232,191,205)'}
-                        ])
-                    }
-                },
-                data: data
-            }
-        ]
-    };
-// Enable data zoom when user click bar.
-    const zoomSize = 6;
-    myChart.on('click', function (params) {
-        console.log(dataAxis[Math.max(params.dataIndex - zoomSize / 2, 0)]);
-        myChart.dispatchAction({
-            type: 'dataZoom',
-            startValue: dataAxis[Math.max(params.dataIndex - zoomSize / 2, 0)],
-            endValue:
-                dataAxis[Math.min(params.dataIndex + zoomSize / 2, data.length - 1)]
-        });
-    });
+    //设计画图
+    function getData() {
+        $.ajax({
+            //渲染的是127.0.0.1/test 下的json数据
+            url: '/planeMap/lrd',
+            data: data,
+            type: 'POST',
+            dataType: 'json',
+            success: function (datab) {
 
-    // (1)准备数据
-    /*var data = {
-        year: [
-            [24, 40, 101, 134, 90, 230, 210, 230, 120, 230, 210, 120],
-            [40, 64, 191, 324, 290, 330, 310, 213, 180, 200, 180, 79]
-        ]
-    };
+                app.xaxis = datab.xaxis;
+                app.yvalues1 = datab.yvalues1;
 
-    // 2. 指定配置和数据
-    var option = {
-        color: ["#00f2f1", "#ed3f35"],
-        tooltip: {
-            // 通过坐标轴来触发
-            trigger: "axis"
-        },
-        legend: {
-            // 距离容器10%
-            right: "10%",
-            // 修饰图例文字的颜色
-            textStyle: {
-                color: "#4c9bfd"
-            }
-            // 如果series 里面设置了name，此时图例组件的data可以省略
-            // data: ["邮件营销", "联盟广告"]
-        },
-        grid: {
-            top: "20%",
-            left: "3%",
-            right: "4%",
-            bottom: "3%",
-            show: true,
-            borderColor: "#012f4a",
-            containLabel: true
-        },
-
-        xAxis: {
-            type: "category",
-            boundaryGap: false,
-            data: [
-                "1月",
-                "2月",
-                "3月",
-                "4月",
-                "5月",
-                "6月",
-                "7月",
-                "8月",
-                "9月",
-                "10月",
-                "11月",
-                "12月"
-            ],
-            // 去除刻度
-            axisTick: {
-                show: false
-            },
-            // 修饰刻度标签的颜色
-            axisLabel: {
-                color: "rgba(255,255,255,.7)"
-            },
-            // 去除x坐标轴的颜色
-            axisLine: {
-                show: false
-            }
-        },
-        yAxis: {
-            type: "value",
-            // 去除刻度
-            axisTick: {
-                show: false
-            },
-            // 修饰刻度标签的颜色
-            axisLabel: {
-                color: "rgba(255,255,255,.7)"
-            },
-            // 修改y轴分割线的颜色
-            splitLine: {
-                lineStyle: {
-                    color: "#012f4a"
+                let dataAxis = app.xaxis;
+                // prettier-ignore
+                let data = app.yvalues1;
+                let yMax = 0.2;
+                let dataShadow = [];
+                for (let i = 0; i < data.length; i++) {
+                    dataShadow.push(yMax);
                 }
-            }
-        },
-        series: [
-            {
-                name: "新增粉丝",
-                type: "line",
-                stack: "总量",
-                // 是否让线条圆滑显示
-                smooth: true,
-                data: data.year[0]
-            },
-            {
-                name: "新增游客",
-                type: "line",
-                stack: "总量",
-                smooth: true,
-                data: data.year[1]
-            }
-        ]
-    };
-    // 3. 把配置和数据给实例对象
-    myChart.setOption(option);*/
+                option = {
+                    tooltip: {
+                        trigger: "axis",
+                        axisPointer: {
+                            // 坐标轴指示器，坐标轴触发有效
+                            type: "line" // 默认为直线，可选为：'line' | 'shadow'
+                        }
+                    },
+                    /*title: {
+                        text: '特性示例：渐变色 阴影 点击缩放',
+                        subtext: 'Feature Sample: Gradient Color, Shadow, Click Zoom'
+                    },*/
+                    grid: {
+                        left: "0%",
+                        top: "10px",
+                        right: "0%",
+                        bottom: "4%",
+                        containLabel: true
+                    },
+                    xAxis: {
+                        data: dataAxis,
+                        axisLabel: {
+                            inside: true,
+                            color: '#fff'
+                        },
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            show: false
+                        },
+                        z: 10
+                    },
+                    yAxis: {
+                        axisLine: {
+                            show: false
+                        },
+                        axisTick: {
+                            show: false
+                        },
+                        axisLabel: {
+                            color: '#999'
+                        }
+                    },
+                    dataZoom: [
+                        {
+                            type: 'inside'
+                        }
+                    ],
+                    series: [
+                        {
+                            name: '晚点/取消率',
+                            type: 'bar',
+                            showBackground: true,
+                            itemStyle: {
+                                barBorderRadius: 4,
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    {offset: 0, color: 'rgb(232,191,205)'},
+                                    {offset: 0.5, color: 'rgb(204,147,197)'},
+                                    {offset: 1, color: '#188df0'}
+                                ])
+                            },
+                            emphasis: {
 
-    // 重新把配置好的新数据给实例对象
-    myChart.setOption(option);
-    window.addEventListener("resize", function () {
-        myChart.resize();
-    });
+                                itemStyle: {
+                                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                        {offset: 0, color: '#2378f7'},
+                                        {offset: 0.7, color: 'rgb(204,147,197)'},
+                                        {offset: 1, color: 'rgb(232,191,205)'}
+                                    ])
+                                }
+                            },
+                            data: data
+                        }
+                    ]
+                };
+// Enable data zoom when user click bar.
+                const zoomSize = 6;
+                myChart.on('click', function (params) {
+                    console.log(dataAxis[Math.max(params.dataIndex - zoomSize / 2, 0)]);
+                    myChart.dispatchAction({
+                        type: 'dataZoom',
+                        startValue: dataAxis[Math.max(params.dataIndex - zoomSize / 2, 0)],
+                        endValue:
+                            dataAxis[Math.min(params.dataIndex + zoomSize / 2, data.length - 1)]
+                    });
+                });
+
+                // (1)准备数据
+                /*var data = {
+                    year: [
+                        [24, 40, 101, 134, 90, 230, 210, 230, 120, 230, 210, 120],
+                        [40, 64, 191, 324, 290, 330, 310, 213, 180, 200, 180, 79]
+                    ]
+                };
+
+                // 2. 指定配置和数据
+                var option = {
+                    color: ["#00f2f1", "#ed3f35"],
+                    tooltip: {
+                        // 通过坐标轴来触发
+                        trigger: "axis"
+                    },
+                    legend: {
+                        // 距离容器10%
+                        right: "10%",
+                        // 修饰图例文字的颜色
+                        textStyle: {
+                            color: "#4c9bfd"
+                        }
+                        // 如果series 里面设置了name，此时图例组件的data可以省略
+                        // data: ["邮件营销", "联盟广告"]
+                    },
+                    grid: {
+                        top: "20%",
+                        left: "3%",
+                        right: "4%",
+                        bottom: "3%",
+                        show: true,
+                        borderColor: "#012f4a",
+                        containLabel: true
+                    },
+
+                    xAxis: {
+                        type: "category",
+                        boundaryGap: false,
+                        data: [
+                            "1月",
+                            "2月",
+                            "3月",
+                            "4月",
+                            "5月",
+                            "6月",
+                            "7月",
+                            "8月",
+                            "9月",
+                            "10月",
+                            "11月",
+                            "12月"
+                        ],
+                        // 去除刻度
+                        axisTick: {
+                            show: false
+                        },
+                        // 修饰刻度标签的颜色
+                        axisLabel: {
+                            color: "rgba(255,255,255,.7)"
+                        },
+                        // 去除x坐标轴的颜色
+                        axisLine: {
+                            show: false
+                        }
+                    },
+                    yAxis: {
+                        type: "value",
+                        // 去除刻度
+                        axisTick: {
+                            show: false
+                        },
+                        // 修饰刻度标签的颜色
+                        axisLabel: {
+                            color: "rgba(255,255,255,.7)"
+                        },
+                        // 修改y轴分割线的颜色
+                        splitLine: {
+                            lineStyle: {
+                                color: "#012f4a"
+                            }
+                        }
+                    },
+                    series: [
+                        {
+                            name: "新增粉丝",
+                            type: "line",
+                            stack: "总量",
+                            // 是否让线条圆滑显示
+                            smooth: true,
+                            data: data.year[0]
+                        },
+                        {
+                            name: "新增游客",
+                            type: "line",
+                            stack: "总量",
+                            smooth: true,
+                            data: data.year[1]
+                        }
+                    ]
+                };
+                // 3. 把配置和数据给实例对象
+                myChart.setOption(option);*/
+
+                // 重新把配置好的新数据给实例对象
+                myChart.setOption(option);
+                window.addEventListener("resize", function () {
+                    myChart.resize();
+                });
+
+            },
+            error: function (msg) {
+                console.log(msg);
+                alert('系统发生错误');
+            }
+        })
+    }
+
+
 })();
 
 // 饼形图定制
@@ -456,112 +498,166 @@ var act_date = document.getElementById('indataid').getAttribute('d');
     var myChart = echarts.init(document.querySelector(".bar1 .chart"));
     // prettier-ignore
 
-
-    var data = [70, 34, 60, 78, 69];
-    var titlename = ["HTML5", "CSS3", "javascript", "VUE", "NODE"];
-    var valdata = [702, 350, 610, 793, 664];
-    var myColor = ["#1089E7", "#F57474", "#56D0E3", "#F8B448", "#8B78F6"];
-    option = {
-        //图标位置
-        grid: {
-            top: "10%",
-            left: "22%",
-            bottom: "10%"
-        },
-        xAxis: {
-            show: false
-        },
-        yAxis: [
-            {
-                show: true,
-                data: titlename,
-                inverse: true,
-                axisLine: {
-                    show: false
-                },
-                splitLine: {
-                    show: false
-                },
-                axisTick: {
-                    show: false
-                },
-                axisLabel: {
-                    color: "#fff",
-
-                    rich: {
-                        lg: {
-                            backgroundColor: "#339911",
-                            color: "#fff",
-                            borderRadius: 15,
-                            // padding: 5,
-                            align: "center",
-                            width: 15,
-                            height: 15
-                        }
-                    }
-                }
-            },
-            {
-                show: true,
-                inverse: true,
-                data: valdata,
-                axisLabel: {
-                    textStyle: {
-                        fontSize: 12,
-                        color: "#fff"
-                    }
-                }
-            }
-        ],
-        series: [
-            {
-                name: "条",
-                type: "bar",
-                yAxisIndex: 0,
-                data: data,
-                barCategoryGap: 50,
-                barWidth: 10,
-                itemStyle: {
-                    normal: {
-                        barBorderRadius: 20,
-                        color: function (params) {
-                            var num = myColor.length;
-                            return myColor[params.dataIndex % num];
-                        }
-                    }
-                },
-                label: {
-                    normal: {
-                        show: true,
-                        position: "inside",
-                        formatter: "{c}%"
-                    }
-                }
-            },
-            {
-                name: "框",
-                type: "bar",
-                yAxisIndex: 1,
-                barCategoryGap: 50,
-                data: [100, 100, 100, 100, 100],
-                barWidth: 15,
-                itemStyle: {
-                    normal: {
-                        color: "none",
-                        borderColor: "#00c1de",
-                        borderWidth: 3,
-                        barBorderRadius: 15
-                    }
-                }
-            }
-        ]
+    var app = {
+        xaxis: [],
+        yvalues1: [],
+        sum: 0
     };
 
-    // 使用刚指定的配置项和数据显示图表。
-    myChart.setOption(option);
-    window.addEventListener("resize", function () {
-        myChart.resize();
+    //发送ajax请求
+    $(document).ready(function () {
+        getData();
+        console.log(app.xaxis);
+        console.log(app.yvalues1);
+        console.log(app.sum);
     });
+    var data = {
+        data: JSON.stringify({
+            'start_area': start_area,
+            'end_area': end_area,
+            'act_date': act_date
+        }),
+    }
+
+    //设计画图
+    function getData() {
+        $.ajax({
+            //渲染的是127.0.0.1/test 下的json数据
+            url: '/planeMap/ptd',
+            data: data,
+            type: 'POST',
+            dataType: 'json',
+            success: function (datab) {
+
+                app.xaxis = datab.xaxis;
+                app.yvalues1 = datab.yvalues1;
+                app.sum = datab.sum;
+                var sum = app.sum;
+
+                var pdata = [];
+                for (var j = 0;j < app.yvalues1.length;j++) {
+                    var tmp = app.yvalues1[j] * 100 / sum;
+                    pdata.push(tmp);
+                }
+                var downdata = [];
+                for (var j = 0;j < app.yvalues1.length;j++) {
+                    downdata.push(100);
+                }
+
+                var data = pdata;
+                var titlename = app.xaxis;
+                var valdata = app.yvalues1;
+                var myColor = ["#1089E7", "#F57474", "#56D0E3", "#F8B448", "#8B78F6"];
+                option = {
+                    //图标位置
+                    grid: {
+                        top: "10%",
+                        left: "22%",
+                        bottom: "10%"
+                    },
+                    xAxis: {
+                        show: false
+                    },
+                    yAxis: [
+                        {
+                            show: true,
+                            data: titlename,
+                            inverse: true,
+                            axisLine: {
+                                show: false
+                            },
+                            splitLine: {
+                                show: false
+                            },
+                            axisTick: {
+                                show: false
+                            },
+                            axisLabel: {
+                                color: "#fff",
+
+                                rich: {
+                                    lg: {
+                                        backgroundColor: "#339911",
+                                        color: "#fff",
+                                        borderRadius: 15,
+                                        // padding: 5,
+                                        align: "center",
+                                        width: 15,
+                                        height: 15
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            show: true,
+                            inverse: true,
+                            data: valdata,
+                            axisLabel: {
+                                textStyle: {
+                                    fontSize: 12,
+                                    color: "#fff"
+                                }
+                            }
+                        }
+                    ],
+                    series: [
+                        {
+                            name: "条",
+                            type: "bar",
+                            yAxisIndex: 0,
+                            data: data,
+                            barCategoryGap: 50,
+                            barWidth: 10,
+                            itemStyle: {
+                                normal: {
+                                    barBorderRadius: 20,
+                                    color: function (params) {
+                                        var num = myColor.length;
+                                        return myColor[params.dataIndex % num];
+                                    }
+                                }
+                            },
+                            label: {
+                                normal: {
+                                    show: true,
+                                    position: "inside",
+                                    formatter: "{c}%"
+                                }
+                            }
+                        },
+                        {
+                            name: "框",
+                            type: "bar",
+                            yAxisIndex: 1,
+                            barCategoryGap: 50,
+                            data: downdata,
+                            barWidth: 15,
+                            itemStyle: {
+                                normal: {
+                                    color: "none",
+                                    borderColor: "#00c1de",
+                                    borderWidth: 3,
+                                    barBorderRadius: 15
+                                }
+                            }
+                        }
+                    ]
+                };
+
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+                window.addEventListener("resize", function () {
+                    myChart.resize();
+                });
+            },
+            error: function (msg) {
+                console.log(msg);
+                alert('系统发生错误');
+            }
+        })
+    }
+
+
 })();
 // 折线图 优秀作品
 (function () {
@@ -837,70 +933,106 @@ var act_date = document.getElementById('indataid').getAttribute('d');
 (function () {
     // 1. 实例化对象
     var myChart = echarts.init(document.querySelector(".pie1  .chart"));
-    // 2. 指定配置项和数据
-    var option = {
-        legend: {
-            top: "90%",
-            itemWidth: 10,
-            itemHeight: 10,
-            textStyle: {
-                color: "rgba(255,255,255,.5)",
-                fontSize: "12"
-            }
-        },
-        tooltip: {
-            trigger: "item",
-            formatter: "{a} <br/>{b} : {c} ({d}%)"
-        },
-        // 注意颜色写的位置
-        color: [
-            "#006cff",
-            "#60cda0",
-            "#ed8884",
-            "#ff9f7f",
-            "#0096ff",
-            "#9fe6b8",
-            "#32c5e9",
-            "#1d9dff"
-        ],
-        series: [
-            {
-                name: "点位统计",
-                type: "pie",
-                // 如果radius是百分比则必须加引号
-                radius: ["10%", "70%"],
-                center: ["50%", "42%"],
-                roseType: "radius",
-                data: [
-                    {value: 20, name: "云南"},
-                    {value: 26, name: "北京"},
-                    {value: 24, name: "山东"},
-                    {value: 25, name: "河北"},
-                    {value: 20, name: "江苏"},
-                    {value: 25, name: "浙江"},
-                    {value: 30, name: "深圳"},
-                    {value: 42, name: "广东"}
-                ],
-                // 修饰饼形图文字相关的样式 label对象
-                label: {
-                    fontSize: 10
-                },
-                // 修饰引导线样式
-                labelLine: {
-                    // 连接到图形的线长度
-                    length: 10,
-                    // 连接到文字的线长度
-                    length2: 10
-                }
-            }
-        ]
+
+    var app = {
+        xaxis: [],
+        yvalues1: []
     };
 
-    // 3. 配置项和数据给我们的实例化对象
-    myChart.setOption(option);
-    // 4. 当我们浏览器缩放的时候，图表也等比例缩放
-    window.addEventListener("resize", function () {
-        // 让我们的图表调用 resize这个方法
-        myChart.resize();
+    //发送ajax请求
+    $(document).ready(function () {
+        getData();
+        console.log(app.xaxis);
+        console.log(app.yvalues1)
     });
+    var data = {
+        data: JSON.stringify({
+            'start_area': start_area,
+            'end_area': end_area,
+            'act_date': act_date
+        }),
+    }
+
+    //设计画图
+    function getData() {
+        $.ajax({
+            //渲染的是127.0.0.1/test 下的json数据
+            url: '/planeMap/acomd',
+            data: data,
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+
+                app.xaxis = data.xaxis;
+                app.yvalues1 = data.yvalues1;
+
+                var aircom_datas = [];
+                for (var j = 0; j < app.xaxis.length; j++) {
+                    var tmp = {value: app.yvalues1[j], name: app.xaxis[j]};
+                    aircom_datas[j] = tmp;
+                }
+                console.log(aircom_datas);
+                var option = {
+                    legend: {
+                        top: "90%",
+                        itemWidth: 10,
+                        itemHeight: 10,
+                        textStyle: {
+                            color: "rgba(255,255,255,.5)",
+                            fontSize: "12"
+                        }
+                    },
+                    tooltip: {
+                        trigger: "item",
+                        formatter: "{a} <br/>{b} : {c} ({d}%)"
+                    },
+                    // 注意颜色写的位置
+                    color: [
+                        "#006cff",
+                        "#60cda0",
+                        "#ed8884",
+                        "#ff9f7f",
+                        "#0096ff",
+                        "#9fe6b8",
+                        "#32c5e9",
+                        "#1d9dff"
+                    ],
+                    series: [
+                        {
+                            name: "点位统计",
+                            type: "pie",
+                            // 如果radius是百分比则必须加引号
+                            radius: ["10%", "70%"],
+                            center: ["50%", "42%"],
+                            roseType: "radius",
+                            data: aircom_datas,
+                            // 修饰饼形图文字相关的样式 label对象
+                            label: {
+                                fontSize: 10
+                            },
+                            // 修饰引导线样式
+                            labelLine: {
+                                // 连接到图形的线长度
+                                length: 10,
+                                // 连接到文字的线长度
+                                length2: 10
+                            }
+                        }
+                    ]
+                };
+
+                // 3. 配置项和数据给我们的实例化对象
+                myChart.setOption(option);
+                // 4. 当我们浏览器缩放的时候，图表也等比例缩放
+                window.addEventListener("resize", function () {
+                    // 让我们的图表调用 resize这个方法
+                    myChart.resize();
+                });
+            },
+            error: function (msg) {
+                console.log(msg);
+                alert('系统发生错误');
+            }
+        })
+    }
 })();

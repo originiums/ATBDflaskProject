@@ -208,5 +208,125 @@ def price_range_data():
     # 渲染html模板
     return (j)
 
+@app.route("/planeMap/lrd", methods=['POST'])
+def lose_rate_data():
+    data = json.loads(request.form.get('data'))
+    start_area = data['start_area']
+    end_area = data['end_area']
+    act_date = data['act_date']
+    # print(start_area, end_area, act_date)
+
+    conn = pymysql.connect(host='127.0.0.1', user='root', password='', db='buggerexe')  # 建立数据库连接
+    cur = conn.cursor()
+    sql = "SELECT air_id, lose_rate FROM airline " \
+          "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
+          "order by lose_rate desc limit 20" % (start_area, end_area, act_date)  # sql语句
+    print(sql)
+    cur.execute(sql)  # execute(query, args):执行单条sql语句。
+    see = cur.fetchall()  # 使结果全部可看
+    xaxis = []
+    jsonData = {}
+    yvalues1 = []
+
+    for data in see:
+        xaxis.append(data[0])
+        yvalues1.append(data[1])
+
+    jsonData['xaxis'] = xaxis
+    jsonData['yvalues1'] = yvalues1
+    # print(jsonData)
+    # 将json格式转成str，因为如果直接将dict类型的数据写入json会发生报错，因此将数据写入时需要用到该函数。
+    j = json.dumps(jsonData, cls=DecimalEncoder, ensure_ascii=False)
+    # print(j)
+    cur.close()
+    conn.close()
+    # 渲染html模板
+    return (j)
+
+@app.route("/planeMap/acomd", methods=['POST'])
+def air_com_data():
+    data = json.loads(request.form.get('data'))
+    start_area = data['start_area']
+    end_area = data['end_area']
+    act_date = data['act_date']
+    # print(start_area, end_area, act_date)
+
+    conn = pymysql.connect(host='127.0.0.1', user='root', password='', db='buggerexe')  # 建立数据库连接
+    cur = conn.cursor()
+    sql = "SELECT air_com, count(1) as acc FROM airline " \
+          "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
+          "group by air_com " \
+          "order by acc limit 15" % (start_area, end_area, act_date)  # sql语句
+    print(sql)
+    cur.execute(sql)  # execute(query, args):执行单条sql语句。
+    see = cur.fetchall()  # 使结果全部可看
+    xaxis = []
+    jsonData = {}
+    yvalues1 = []
+
+    for data in see:
+        xaxis.append(data[0])
+        yvalues1.append(data[1])
+
+    jsonData['xaxis'] = xaxis
+    jsonData['yvalues1'] = yvalues1
+    # print(jsonData)
+    # 将json格式转成str，因为如果直接将dict类型的数据写入json会发生报错，因此将数据写入时需要用到该函数。
+    j = json.dumps(jsonData, cls=DecimalEncoder, ensure_ascii=False)
+    # print(j)
+    cur.close()
+    conn.close()
+    # 渲染html模板
+    return (j)
+
+@app.route("/planeMap/ptd", methods=['POST'])
+def plane_type_data():
+    data = json.loads(request.form.get('data'))
+    start_area = data['start_area']
+    end_area = data['end_area']
+    act_date = data['act_date']
+    # print(start_area, end_area, act_date)
+
+    conn = pymysql.connect(host='127.0.0.1', user='root', password='', db='buggerexe')  # 建立数据库连接
+    cur = conn.cursor()
+    sql = "SELECT plane_type, count(1) as acc FROM airline " \
+          "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
+          "group by plane_type " \
+          "order by acc limit 5" % (start_area, end_area, act_date)  # sql语句
+    print(sql)
+    cur.execute(sql)  # execute(query, args):执行单条sql语句。
+    see = cur.fetchall()  # 使结果全部可看
+    xaxis = []
+    jsonData = {}
+    yvalues1 = []
+
+
+    for data in see:
+        xaxis.append(data[0])
+        yvalues1.append(data[1])
+
+    sum = 0
+    sql = "SELECT sum(1) FROM airline " \
+          "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " % (start_area, end_area, act_date)  # sql语句
+    print(sql)
+    cur.execute(sql)  # execute(query, args):执行单条sql语句。
+    see1 = cur.fetchall()
+    for data in see1:
+        sum = data[0]
+
+
+    jsonData['xaxis'] = xaxis
+    jsonData['yvalues1'] = yvalues1
+    jsonData['sum'] = sum
+    # print(jsonData)
+    # 将json格式转成str，因为如果直接将dict类型的数据写入json会发生报错，因此将数据写入时需要用到该函数。
+    j = json.dumps(jsonData, cls=DecimalEncoder, ensure_ascii=False)
+    # print(j)
+    cur.close()
+    conn.close()
+    # 渲染html模板
+    return (j)
+
+
 if __name__ == '__main__':
     app.run(debug=True)  # 启用调试模式
