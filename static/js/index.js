@@ -5,101 +5,136 @@ var act_date = document.getElementById('indataid').getAttribute('d');
 (function () {
     // 实例化对象
     var myChart = echarts.init(document.querySelector(".bar .chart"));
-    // 指定配置和数据
-    var option = {
-        color: ["#2f89cf"],
-        tooltip: {
-            trigger: "axis",
-            axisPointer: {
-                // 坐标轴指示器，坐标轴触发有效
-                type: "shadow" // 默认为直线，可选为：'line' | 'shadow'
-            }
-        },
-        grid: {
-            left: "0%",
-            top: "10px",
-            right: "0%",
-            bottom: "4%",
-            containLabel: true
-        },
-        xAxis: [
-            {
-                type: "category",
-                data: [
-                    "旅游行业",
-                    "教育培训",
-                    "游戏行业",
-                    "医疗行业",
-                    "电商行业",
-                    "社交行业",
-                    "金融行业"
-                ],
-                axisTick: {
-                    alignWithLabel: true
-                },
-                axisLabel: {
-                    textStyle: {
-                        color: "rgba(255,255,255,.6)",
-                        fontSize: "12"
-                    }
-                },
-                axisLine: {
-                    show: false
-                }
-            }
-        ],
-        yAxis: [
-            {
-                type: "value",
-                axisLabel: {
-                    textStyle: {
-                        color: "rgba(255,255,255,.6)",
-                        fontSize: "12"
-                    }
-                },
-                axisLine: {
-                    lineStyle: {
-                        color: "rgba(255,255,255,.1)"
-                        // width: 1,
-                        // type: "solid"
-                    }
-                },
-                splitLine: {
-                    lineStyle: {
-                        color: "rgba(255,255,255,.1)"
-                    }
-                }
-            }
-        ],
-        series: [
-            {
-                name: "价格区间",
-                type: "bar",
-                barWidth: "35%",
-                data: [200, 300, 300, 900, 1500, 1200, 600],
-                itemStyle: {
-                    barBorderRadius: 5
-                }
-            }
-        ]
+
+    var app = {
+        xaxis: [],
+        yvalue1: [],
+        yvalue2: []
     };
 
-    // 把配置给实例对象
-    myChart.setOption(option);
-    window.addEventListener("resize", function () {
-        myChart.resize();
+    //发送ajax请求
+    $(document).ready(function () {
+        getData();
+        console.log(app.xaxis);
+        console.log(app.yvalue1);
+        console.log(app.yvalue2);
     });
+    var data = {
+        data: JSON.stringify({
+            'start_area': start_area,
+            'end_area': end_area,
+            'act_date': act_date
+        }),
+    }
 
-    // 数据变化
-    var dataAll = [
-        {year: "当日", data: [200, 300, 300, 900, 1500, 1200, 600]},
-        {year: "明日", data: [300, 400, 350, 800, 1800, 1400, 700]}
-    ];
+    //设计画图
+    function getData() {
+        $.ajax({
+            //渲染的是127.0.0.1/test 下的json数据
+            url: '/planeMap/prd',
+            data: data,
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
 
-    $(".bar h2 ").on("click", "a", function () {
-        option.series[0].data = dataAll[$(this).index()].data;
-        myChart.setOption(option);
-    });
+                app.xaxis = data.xaxis;
+                app.yvalue1 = data.yvalues1;
+                app.yvalue2 = data.yvalues2;
+
+                var option = {
+                    color: ["#2f89cf"],
+                    tooltip: {
+                        trigger: "axis",
+                        axisPointer: {
+                            // 坐标轴指示器，坐标轴触发有效
+                            type: "shadow" // 默认为直线，可选为：'line' | 'shadow'
+                        }
+                    },
+                    grid: {
+                        left: "0%",
+                        top: "10px",
+                        right: "0%",
+                        bottom: "4%",
+                        containLabel: true
+                    },
+                    xAxis: [
+                        {
+                            type: "category",
+                            data: app.xaxis,
+                            axisTick: {
+                                alignWithLabel: true
+                            },
+                            axisLabel: {
+                                textStyle: {
+                                    color: "rgba(255,255,255,.6)",
+                                    fontSize: "12"
+                                }
+                            },
+                            axisLine: {
+                                show: false
+                            }
+                        }
+                    ],
+                    yAxis: [
+                        {
+                            type: "value",
+                            axisLabel: {
+                                textStyle: {
+                                    color: "rgba(255,255,255,.6)",
+                                    fontSize: "12"
+                                }
+                            },
+                            axisLine: {
+                                lineStyle: {
+                                    color: "rgba(255,255,255,.1)"
+                                    // width: 1,
+                                    // type: "solid"
+                                }
+                            },
+                            splitLine: {
+                                lineStyle: {
+                                    color: "rgba(255,255,255,.1)"
+                                }
+                            }
+                        }
+                    ],
+                    series: [
+                        {
+                            name: "价格区间",
+                            type: "bar",
+                            barWidth: "35%",
+                            data: app.yvalue1,
+                            itemStyle: {
+                                barBorderRadius: 5
+                            }
+                        }
+                    ]
+                };
+
+                // 把配置给实例对象
+                myChart.setOption(option);
+                window.addEventListener("resize", function () {
+                    myChart.resize();
+                });
+
+                // 数据变化
+                var dataAll = [
+                    {year: "当日", data: app.yvalue1},
+                    {year: "明日", data: app.yvalue2}
+                ];
+
+                $(".bar h2 ").on("click", "a", function () {
+                    option.series[0].data = dataAll[$(this).index()].data;
+                    myChart.setOption(option);
+                });
+            },
+            error: function (msg) {
+                console.log(msg);
+                alert('系统发生错误');
+            }
+        })
+    }
+
 })();
 
 // 折线图定制
@@ -108,7 +143,7 @@ var act_date = document.getElementById('indataid').getAttribute('d');
     var myChart = echarts.init(document.querySelector(".line .chart"));
 
     let dataAxis = ['C10001', 'C10002', 'C10003', '子', '或', '者', '两', '指', '在', '触', '屏', '上', '滑', '动', '能', '够', '自', '动', '缩', '放'];
-// prettier-ignore
+    // prettier-ignore
     let data = [220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125, 220];
     let yMax = 500;
     let dataShadow = [];
@@ -116,11 +151,18 @@ var act_date = document.getElementById('indataid').getAttribute('d');
         dataShadow.push(yMax);
     }
     option = {
+        tooltip: {
+            trigger: "axis",
+            axisPointer: {
+                // 坐标轴指示器，坐标轴触发有效
+                type: "line" // 默认为直线，可选为：'line' | 'shadow'
+            }
+        },
         /*title: {
             text: '特性示例：渐变色 阴影 点击缩放',
             subtext: 'Feature Sample: Gradient Color, Shadow, Click Zoom'
         },*/
-      grid: {
+        grid: {
             left: "0%",
             top: "10px",
             right: "0%",
@@ -159,9 +201,11 @@ var act_date = document.getElementById('indataid').getAttribute('d');
         ],
         series: [
             {
+                name: '晚点/取消率',
                 type: 'bar',
                 showBackground: true,
                 itemStyle: {
+                    barBorderRadius: 4,
                     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                         {offset: 0, color: 'rgb(232,191,205)'},
                         {offset: 0.5, color: 'rgb(204,147,197)'},
@@ -169,6 +213,7 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                     ])
                 },
                 emphasis: {
+
                     itemStyle: {
                         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                             {offset: 0, color: '#2378f7'},
@@ -417,105 +462,105 @@ var act_date = document.getElementById('indataid').getAttribute('d');
     var valdata = [702, 350, 610, 793, 664];
     var myColor = ["#1089E7", "#F57474", "#56D0E3", "#F8B448", "#8B78F6"];
     option = {
-      //图标位置
-      grid: {
-        top: "10%",
-        left: "22%",
-        bottom: "10%"
-      },
-      xAxis: {
-        show: false
-      },
-      yAxis: [
-        {
-          show: true,
-          data: titlename,
-          inverse: true,
-          axisLine: {
+        //图标位置
+        grid: {
+            top: "10%",
+            left: "22%",
+            bottom: "10%"
+        },
+        xAxis: {
             show: false
-          },
-          splitLine: {
-            show: false
-          },
-          axisTick: {
-            show: false
-          },
-          axisLabel: {
-            color: "#fff",
+        },
+        yAxis: [
+            {
+                show: true,
+                data: titlename,
+                inverse: true,
+                axisLine: {
+                    show: false
+                },
+                splitLine: {
+                    show: false
+                },
+                axisTick: {
+                    show: false
+                },
+                axisLabel: {
+                    color: "#fff",
 
-            rich: {
-              lg: {
-                backgroundColor: "#339911",
-                color: "#fff",
-                borderRadius: 15,
-                // padding: 5,
-                align: "center",
-                width: 15,
-                height: 15
-              }
+                    rich: {
+                        lg: {
+                            backgroundColor: "#339911",
+                            color: "#fff",
+                            borderRadius: 15,
+                            // padding: 5,
+                            align: "center",
+                            width: 15,
+                            height: 15
+                        }
+                    }
+                }
+            },
+            {
+                show: true,
+                inverse: true,
+                data: valdata,
+                axisLabel: {
+                    textStyle: {
+                        fontSize: 12,
+                        color: "#fff"
+                    }
+                }
             }
-          }
-        },
-        {
-          show: true,
-          inverse: true,
-          data: valdata,
-          axisLabel: {
-            textStyle: {
-              fontSize: 12,
-              color: "#fff"
+        ],
+        series: [
+            {
+                name: "条",
+                type: "bar",
+                yAxisIndex: 0,
+                data: data,
+                barCategoryGap: 50,
+                barWidth: 10,
+                itemStyle: {
+                    normal: {
+                        barBorderRadius: 20,
+                        color: function (params) {
+                            var num = myColor.length;
+                            return myColor[params.dataIndex % num];
+                        }
+                    }
+                },
+                label: {
+                    normal: {
+                        show: true,
+                        position: "inside",
+                        formatter: "{c}%"
+                    }
+                }
+            },
+            {
+                name: "框",
+                type: "bar",
+                yAxisIndex: 1,
+                barCategoryGap: 50,
+                data: [100, 100, 100, 100, 100],
+                barWidth: 15,
+                itemStyle: {
+                    normal: {
+                        color: "none",
+                        borderColor: "#00c1de",
+                        borderWidth: 3,
+                        barBorderRadius: 15
+                    }
+                }
             }
-          }
-        }
-      ],
-      series: [
-        {
-          name: "条",
-          type: "bar",
-          yAxisIndex: 0,
-          data: data,
-          barCategoryGap: 50,
-          barWidth: 10,
-          itemStyle: {
-            normal: {
-              barBorderRadius: 20,
-              color: function(params) {
-                var num = myColor.length;
-                return myColor[params.dataIndex % num];
-              }
-            }
-          },
-          label: {
-            normal: {
-              show: true,
-              position: "inside",
-              formatter: "{c}%"
-            }
-          }
-        },
-        {
-          name: "框",
-          type: "bar",
-          yAxisIndex: 1,
-          barCategoryGap: 50,
-          data: [100, 100, 100, 100, 100],
-          barWidth: 15,
-          itemStyle: {
-            normal: {
-              color: "none",
-              borderColor: "#00c1de",
-              borderWidth: 3,
-              barBorderRadius: 15
-            }
-          }
-        }
-      ]
+        ]
     };
 
     // 使用刚指定的配置项和数据显示图表。
     myChart.setOption(option);
-    window.addEventListener("resize", function() {
-      myChart.resize();
+    window.addEventListener("resize", function () {
+        myChart.resize();
     });
 })();
 // 折线图 优秀作品

@@ -128,5 +128,85 @@ def map_line_data():
     # 渲染html模板
     return (j)
 
+
+
+@app.route("/planeMap/prd", methods=['POST'])
+def price_range_data():
+    data = json.loads(request.form.get('data'))
+    start_area = data['start_area']
+    end_area = data['end_area']
+    act_date = data['act_date']
+    # print(start_area, end_area, act_date)
+    xaxis = ['400以下', '400~600', '600~800', '800~1000', '1000~1200', '1200~1400', '1400以上']
+    jsonData = {}
+    yvalues1 = []
+    yvalues2 = []
+
+    conn = pymysql.connect(host='127.0.0.1', user='root', password='', db='buggerexe')  # 建立数据库连接
+    cur = conn.cursor()
+    sql = "SELECT count(1) FROM airline " \
+          "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
+          "and Aprice <= 400" % (start_area, end_area, act_date)  # sql语句
+    #print(sql)
+    cur.execute(sql)  # execute(query, args):执行单条sql语句。
+    see1 = cur.fetchall()  # 使结果全部可看
+    for data1 in see1:
+        yvalues1.append(data1[0])
+    sql = "SELECT count(1) FROM airline " \
+          "WHERE start_area like '%s' and end_area like '%s' and act_date like date_add('%s', interval 1 day) " \
+          "and Aprice <= 400" % (start_area, end_area, act_date)  # sql语句
+    print(sql)
+    cur.execute(sql)  # execute(query, args):执行单条sql语句。
+    see2 = cur.fetchall()  # 使结果全部可看
+    for data2 in see2:
+        yvalues2.append(data2[0])
+
+    for i in range(400,1201,200):
+        sql = "SELECT count(1) FROM airline " \
+              "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
+              "and Aprice > %d and Aprice <= %d " % (start_area, end_area, act_date, i, i+200)  # sql语句
+        # print(sql)
+        cur.execute(sql)  # execute(query, args):执行单条sql语句。
+        see1 = cur.fetchall()  # 使结果全部可看
+        for data1 in see1:
+            yvalues1.append(data1[0])
+        sql = "SELECT count(1) FROM airline " \
+              "WHERE start_area like '%s' and end_area like '%s' and act_date like date_add('%s', interval 1 day) " \
+              "and Aprice > %d and Aprice <= %d " % (start_area, end_area, act_date, i, i+200)  # sql语句
+        # print(sql)
+        cur.execute(sql)  # execute(query, args):执行单条sql语句。
+        see2 = cur.fetchall()  # 使结果全部可看
+        for data2 in see2:
+            yvalues2.append(data2[0])
+
+    sql = "SELECT count(1) FROM airline " \
+          "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
+          "and Aprice > 1400" % (start_area, end_area, act_date)  # sql语句
+    # print(sql)
+    cur.execute(sql)  # execute(query, args):执行单条sql语句。
+    see1 = cur.fetchall()  # 使结果全部可看
+    for data1 in see1:
+        yvalues1.append(data1[0])
+    sql = "SELECT count(1) FROM airline " \
+          "WHERE start_area like '%s' and end_area like '%s' and act_date like date_add('%s', interval 1 day) " \
+          "and Aprice > 1400" % (start_area, end_area, act_date)  # sql语句
+    # print(sql)
+    cur.execute(sql)  # execute(query, args):执行单条sql语句。
+    see2 = cur.fetchall()  # 使结果全部可看
+    for data2 in see2:
+        yvalues2.append(data2[0])
+
+    jsonData['xaxis'] = xaxis
+    jsonData['yvalues1'] = yvalues1
+    jsonData['yvalues2'] = yvalues2
+    # print(jsonData)
+    # 将json格式转成str，因为如果直接将dict类型的数据写入json会发生报错，因此将数据写入时需要用到该函数。
+    j = json.dumps(jsonData, cls=DecimalEncoder, ensure_ascii=False)
+    # print(j)
+    cur.close()
+    conn.close()
+    # 渲染html模板
+    return (j)
+
 if __name__ == '__main__':
     app.run(debug=True)  # 启用调试模式
