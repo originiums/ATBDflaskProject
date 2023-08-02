@@ -820,9 +820,9 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                 console.log(aircom_datas);
                 var option = {
                     legend: {
-                        top: "90%",
+                        top: "82%",
                         itemWidth: 10,
-                        itemHeight: 10,
+                        itemHeight: 8,
                         textStyle: {
                             color: "rgba(255,255,255,.5)",
                             fontSize: "12"
