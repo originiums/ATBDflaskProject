@@ -239,9 +239,9 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                             itemStyle: {
                                 barBorderRadius: 4,
                                 color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                    {offset: 0, color: 'rgb(232,191,205)'},
-                                    {offset: 0.5, color: 'rgb(204,147,197)'},
-                                    {offset: 1, color: '#188df0'}
+                                    {offset: 0, color: '#A5FECB'},
+                                    {offset: 0.5, color: '#20BDFF'},
+                                    {offset: 1, color: '#5433FF'}
                                 ])
                             },
                             emphasis: {
@@ -269,110 +269,6 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                             dataAxis[Math.min(params.dataIndex + zoomSize / 2, data.length - 1)]
                     });
                 });
-
-                // (1)准备数据
-                /*var data = {
-                    year: [
-                        [24, 40, 101, 134, 90, 230, 210, 230, 120, 230, 210, 120],
-                        [40, 64, 191, 324, 290, 330, 310, 213, 180, 200, 180, 79]
-                    ]
-                };
-
-                // 2. 指定配置和数据
-                var option = {
-                    color: ["#00f2f1", "#ed3f35"],
-                    tooltip: {
-                        // 通过坐标轴来触发
-                        trigger: "axis"
-                    },
-                    legend: {
-                        // 距离容器10%
-                        right: "10%",
-                        // 修饰图例文字的颜色
-                        textStyle: {
-                            color: "#4c9bfd"
-                        }
-                        // 如果series 里面设置了name，此时图例组件的data可以省略
-                        // data: ["邮件营销", "联盟广告"]
-                    },
-                    grid: {
-                        top: "20%",
-                        left: "3%",
-                        right: "4%",
-                        bottom: "3%",
-                        show: true,
-                        borderColor: "#012f4a",
-                        containLabel: true
-                    },
-
-                    xAxis: {
-                        type: "category",
-                        boundaryGap: false,
-                        data: [
-                            "1月",
-                            "2月",
-                            "3月",
-                            "4月",
-                            "5月",
-                            "6月",
-                            "7月",
-                            "8月",
-                            "9月",
-                            "10月",
-                            "11月",
-                            "12月"
-                        ],
-                        // 去除刻度
-                        axisTick: {
-                            show: false
-                        },
-                        // 修饰刻度标签的颜色
-                        axisLabel: {
-                            color: "rgba(255,255,255,.7)"
-                        },
-                        // 去除x坐标轴的颜色
-                        axisLine: {
-                            show: false
-                        }
-                    },
-                    yAxis: {
-                        type: "value",
-                        // 去除刻度
-                        axisTick: {
-                            show: false
-                        },
-                        // 修饰刻度标签的颜色
-                        axisLabel: {
-                            color: "rgba(255,255,255,.7)"
-                        },
-                        // 修改y轴分割线的颜色
-                        splitLine: {
-                            lineStyle: {
-                                color: "#012f4a"
-                            }
-                        }
-                    },
-                    series: [
-                        {
-                            name: "新增粉丝",
-                            type: "line",
-                            stack: "总量",
-                            // 是否让线条圆滑显示
-                            smooth: true,
-                            data: data.year[0]
-                        },
-                        {
-                            name: "新增游客",
-                            type: "line",
-                            stack: "总量",
-                            smooth: true,
-                            data: data.year[1]
-                        }
-                    ]
-                };
-                // 3. 把配置和数据给实例对象
-                myChart.setOption(option);*/
-
                 // 重新把配置好的新数据给实例对象
                 myChart.setOption(option);
                 window.addEventListener("resize", function () {
@@ -443,9 +339,9 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                         }
                     },
                     legend: {
-                        top: "90%",
-                        itemWidth: 10,
-                        itemHeight: 10,
+                        top: "80%",
+                        itemWidth: 40,
+                        itemHeight: 8,
                         data: app.xday,
                         textStyle: {
                             color: "rgba(255,255,255,.5)",
@@ -459,15 +355,14 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                             center: ["50%", "42%"],
                             radius: ["40%", "60%"],
                             color: [
+                                "#6F61C0",
                                 "#065aab",
-                                "#066eab",
-                                "#0682ab",
-                                "#0696ab",
-                                "#06a0ab",
-                                "#06b4ab",
-                                "#06c8ab",
                                 "#06dcab",
-                                "#06f0ab"
+                                "#A084E8",
+                                "#06b4ab",
+                                "#D5FFE4",
+                                "#066eab",
+                                "#8BE8E5"
                             ],
                             label: {show: false},
                             labelLine: {show: false},
@@ -664,7 +559,42 @@ var act_date = document.getElementById('indataid').getAttribute('d');
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.querySelector(".line1 .chart"));
 
-    option = {
+    var app = {
+        xaxis: [],
+        yvalues1: [],
+        yvalues2: []
+    };
+
+    //发送ajax请求
+    $(document).ready(function () {
+        getData();
+        console.log(app.xaxis);
+        console.log(app.yvalues1);
+        console.log(app.yvalues2);
+    });
+    var data = {
+        data: JSON.stringify({
+            'start_area': start_area,
+            'end_area': end_area,
+            'act_date': act_date
+        }),
+    }
+
+    //设计画图
+    function getData() {
+        $.ajax({
+            //渲染的是127.0.0.1/test 下的json数据
+            url: '/planeMap/apd',
+            data: data,
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+
+                app.xaxis = data.xaxis;
+                app.yvalues1 = data.yvalues1;
+                app.yvalues2 = data.yvalues2;
+
+                option = {
         tooltip: {
             trigger: "axis",
             axisPointer: {
@@ -704,37 +634,7 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                     }
                 },
 
-                data: [
-                    "01",
-                    "02",
-                    "03",
-                    "04",
-                    "05",
-                    "06",
-                    "07",
-                    "08",
-                    "09",
-                    "11",
-                    "12",
-                    "13",
-                    "14",
-                    "15",
-                    "16",
-                    "17",
-                    "18",
-                    "19",
-                    "20",
-                    "21",
-                    "22",
-                    "23",
-                    "24",
-                    "25",
-                    "26",
-                    "27",
-                    "28",
-                    "29",
-                    "30"
-                ]
+                data: app.xaxis
             },
             {
                 axisPointer: {show: false},
@@ -810,38 +710,7 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                         borderWidth: 12
                     }
                 },
-                data: [
-                    30,
-                    40,
-                    30,
-                    40,
-                    30,
-                    40,
-                    30,
-                    60,
-                    20,
-                    40,
-                    20,
-                    40,
-                    30,
-                    40,
-                    30,
-                    40,
-                    30,
-                    40,
-                    30,
-                    60,
-                    20,
-                    40,
-                    20,
-                    40,
-                    30,
-                    60,
-                    20,
-                    40,
-                    20,
-                    40
-                ]
+                data: app.yvalues1
             },
             {
                 name: "平均票价",
@@ -885,39 +754,7 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                         borderWidth: 12
                     }
                 },
-                data: [
-                    50,
-                    30,
-                    50,
-                    60,
-                    10,
-                    50,
-                    30,
-                    50,
-                    60,
-                    40,
-                    60,
-                    40,
-                    80,
-                    30,
-                    50,
-                    60,
-                    10,
-                    50,
-                    30,
-                    70,
-                    20,
-                    50,
-                    10,
-                    40,
-                    50,
-                    30,
-                    70,
-                    20,
-                    50,
-                    10,
-                    40
-                ]
+                data: app.yvalues2
             }
         ]
     };
@@ -927,6 +764,15 @@ var act_date = document.getElementById('indataid').getAttribute('d');
     window.addEventListener("resize", function () {
         myChart.resize();
     });
+            },
+            error: function (msg) {
+                console.log(msg);
+                alert('系统发生错误');
+            }
+        })
+    }
+
+
 })();
 
 // 点位分布统计模块
