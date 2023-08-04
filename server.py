@@ -56,7 +56,7 @@ def show_da1():
 
 @app.route("/planeMap/<start>/<end>/<date>")
 def show_datas(start='%', date='2023-08-04', end='%'):
-    print(start, date, end)
+    # print(start, date, end)
     return render_template('index.html', start=start, end=end, date=date)
 
 
@@ -217,7 +217,6 @@ def lose_rate_data():
     end_area = data['end_area']
     act_date = data['act_date']
     # print(start_area, end_area, act_date)
-
     conn = pymysql.connect(host=hosturl, user='root', password='', db=sqldb)  # 建立数据库连接
     cur = conn.cursor()
     sql = "SELECT air_id, round(AVG(late_rate),2) as lr FROM airline " \
@@ -230,20 +229,16 @@ def lose_rate_data():
     xaxis = []
     jsonData = {}
     yvalues1 = []
-
     for data in see:
         xaxis.append(data[0])
         yvalues1.append(data[1])
-
     jsonData['xaxis'] = xaxis
     jsonData['yvalues1'] = yvalues1
     # print(jsonData)
     # 将json格式转成str，因为如果直接将dict类型的数据写入json会发生报错，因此将数据写入时需要用到该函数。
     j = json.dumps(jsonData, cls=DecimalEncoder, ensure_ascii=False)
-    # print(j)
     cur.close()
     conn.close()
-    # 渲染html模板
     return (j)
 
 @app.route("/planeMap/acomd", methods=['POST'])
