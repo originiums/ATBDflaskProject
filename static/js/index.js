@@ -177,7 +177,7 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                 let dataAxis = app.xaxis;
                 // prettier-ignore
                 let data = app.yvalues1;
-                let yMax = 0.2;
+                let yMax = 50;
                 let dataShadow = [];
                 for (let i = 0; i < data.length; i++) {
                     dataShadow.push(yMax);
@@ -233,7 +233,7 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                     ],
                     series: [
                         {
-                            name: '晚点/取消率',
+                            name: '平均延误时间',
                             type: 'bar',
                             showBackground: true,
                             itemStyle: {
@@ -432,6 +432,7 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                 var pdata = [];
                 for (var j = 0;j < app.yvalues1.length;j++) {
                     var tmp = app.yvalues1[j] * 100 / sum;
+                    tmp = tmp.toFixed(2);
                     pdata.push(tmp);
                 }
                 var downdata = [];
@@ -515,7 +516,7 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                             label: {
                                 normal: {
                                     show: true,
-                                    position: "inside",
+                                    position: "outside",
                                     formatter: "{c}%"
                                 }
                             }

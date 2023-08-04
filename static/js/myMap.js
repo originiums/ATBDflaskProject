@@ -120,7 +120,10 @@ var act_date = document.getElementById('indataid').getAttribute('d');
         长治: [112.8625, 36.4746],
         阳泉: [113.4778, 38.0951],
         青岛: [120.4651, 36.3373],
-        韶关: [113.7964, 24.7028]
+        韶关: [113.7964, 24.7028],
+        三亚: [109.7525, 18.4001],
+        张家界: [110.5504, 29.3459],
+        揭阳:[116.41211, 23.56606]
     };
 
     var lineData = [];
@@ -160,8 +163,11 @@ var act_date = document.getElementById('indataid').getAttribute('d');
                 alert(app.sta);*/
                 /*var time_datas=[];*/
                 for (var j = 0; j < app.eda.length; j++) {
-                    var tmp = [{name: app.sta[j]}, {name: app.eda[j], value: 100}];
-                    lineData.push(tmp);
+                    if(app.sta[j] in geoCoordMap && app.eda[j] in geoCoordMap ){
+                        var tmp = [{name: app.sta[j]}, {name: app.eda[j], value: 100}];
+                        lineData.push(tmp);
+                    }
+
                 }
                 console.log(lineData);
                 var XAData = [...lineData];

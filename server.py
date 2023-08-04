@@ -18,6 +18,8 @@ class DecimalEncoder(json.JSONEncoder):
             return int(o)
         super(DecimalEncoder, self).default(o)
 
+hosturl = '127.0.0.1'
+sqldb = 'atbd'
 
 @app.route("/")
 def my_echart():
@@ -49,11 +51,11 @@ def my_echart():
 
 @app.route("/planeMap")
 def show_da1():
-    return redirect(url_for('show_datas', start='%', date='2023-08-08', end='%'))
+    return redirect(url_for('show_datas', start='%', date='2023-08-04', end='%'))
 
 
 @app.route("/planeMap/<start>/<end>/<date>")
-def show_datas(start='%', date='2023-08-08', end='%'):
+def show_datas(start='%', date='2023-08-04', end='%'):
     print(start, date, end)
     return render_template('index.html', start=start, end=end, date=date)
 
@@ -66,7 +68,7 @@ def time_range_data():
     act_date = data['act_date']
     # print(start_area, end_area, act_date)
 
-    conn = pymysql.connect(host='127.0.0.1', user='root', password='', db='buggerexe')  # 建立数据库连接
+    conn = pymysql.connect(host=hosturl, user='root', password='', db=sqldb)  # 建立数据库连接
     cur = conn.cursor()
     xdays = ['00~03', '03~06','06~09','09~12','12~15','15~18','18~21', '21~24']
     jsonData = {}
@@ -74,9 +76,9 @@ def time_range_data():
     for i in range(0, 21, 3):
         sql = "SELECT count(1) FROM airline " \
               "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
-              "and act_time > time(date_add('%s',interval %d hour)) " \
-              "and act_time <= time(date_add('%s',interval %d hour)); " % (start_area, end_area, act_date, act_date + ' 00:00:00', i, act_date + ' 00:00:00', i+3)  # sql语句
-        print(sql)
+              "and takeoff_time > time(date_add('%s',interval %d hour)) " \
+              "and takeoff_time <= time(date_add('%s',interval %d hour)); " % (start_area, end_area, act_date, act_date + ' 00:00:00', i, act_date + ' 00:00:00', i+3)  # sql语句
+        # print(sql)
         cur.execute(sql)  # execute(query, args):执行单条sql语句。
         see1 = cur.fetchall()  # 使结果全部可看
         for data1 in see1:
@@ -101,12 +103,12 @@ def map_line_data():
     act_date = data['act_date']
     # print(start_area, end_area, act_date)
 
-    conn = pymysql.connect(host='127.0.0.1', user='root', password='', db='buggerexe')  # 建立数据库连接
+    conn = pymysql.connect(host=hosturl, user='root', password='', db=sqldb)  # 建立数据库连接
     cur = conn.cursor()
     sql = "SELECT start_area, end_area FROM airline " \
           "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
           "GROUP BY start_area, end_area" % (start_area, end_area, act_date)  # sql语句
-    print(sql)
+    # print(sql)
     cur.execute(sql)  # execute(query, args):执行单条sql语句。
     see = cur.fetchall()  # 使结果全部可看
     sta = []
@@ -137,34 +139,34 @@ def price_range_data():
     end_area = data['end_area']
     act_date = data['act_date']
     # print(start_area, end_area, act_date)
-    xaxis = ['400以下', '400~600', '600~800', '800~1000', '1000~1200', '1200~1400', '1400以上']
+    xaxis = ['600以下', '600~800', '800~1000', '1000~1200', '1200~1400', '1400~1600', '1600以上']
     jsonData = {}
     yvalues1 = []
     yvalues2 = []
 
-    conn = pymysql.connect(host='127.0.0.1', user='root', password='', db='buggerexe')  # 建立数据库连接
+    conn = pymysql.connect(host=hosturl, user='root', password='', db=sqldb)  # 建立数据库连接
     cur = conn.cursor()
     sql = "SELECT count(1) FROM airline " \
           "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
-          "and Aprice <= 400" % (start_area, end_area, act_date)  # sql语句
-    #print(sql)
+          "and price <= 600" % (start_area, end_area, act_date)  # sql语句
+    # print(sql)
     cur.execute(sql)  # execute(query, args):执行单条sql语句。
     see1 = cur.fetchall()  # 使结果全部可看
     for data1 in see1:
         yvalues1.append(data1[0])
     sql = "SELECT count(1) FROM airline " \
           "WHERE start_area like '%s' and end_area like '%s' and act_date like date_add('%s', interval 1 day) " \
-          "and Aprice <= 400" % (start_area, end_area, act_date)  # sql语句
-    print(sql)
+          "and price <= 600" % (start_area, end_area, act_date)  # sql语句
+    # print(sql)
     cur.execute(sql)  # execute(query, args):执行单条sql语句。
     see2 = cur.fetchall()  # 使结果全部可看
     for data2 in see2:
         yvalues2.append(data2[0])
 
-    for i in range(400,1201,200):
+    for i in range(600,1401,200):
         sql = "SELECT count(1) FROM airline " \
               "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
-              "and Aprice > %d and Aprice <= %d " % (start_area, end_area, act_date, i, i+200)  # sql语句
+              "and price > %d and price <= %d " % (start_area, end_area, act_date, i, i+200)  # sql语句
         # print(sql)
         cur.execute(sql)  # execute(query, args):执行单条sql语句。
         see1 = cur.fetchall()  # 使结果全部可看
@@ -172,7 +174,7 @@ def price_range_data():
             yvalues1.append(data1[0])
         sql = "SELECT count(1) FROM airline " \
               "WHERE start_area like '%s' and end_area like '%s' and act_date like date_add('%s', interval 1 day) " \
-              "and Aprice > %d and Aprice <= %d " % (start_area, end_area, act_date, i, i+200)  # sql语句
+              "and price > %d and price <= %d " % (start_area, end_area, act_date, i, i+200)  # sql语句
         # print(sql)
         cur.execute(sql)  # execute(query, args):执行单条sql语句。
         see2 = cur.fetchall()  # 使结果全部可看
@@ -181,7 +183,7 @@ def price_range_data():
 
     sql = "SELECT count(1) FROM airline " \
           "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
-          "and Aprice > 1400" % (start_area, end_area, act_date)  # sql语句
+          "and price > 1600" % (start_area, end_area, act_date)  # sql语句
     # print(sql)
     cur.execute(sql)  # execute(query, args):执行单条sql语句。
     see1 = cur.fetchall()  # 使结果全部可看
@@ -189,7 +191,7 @@ def price_range_data():
         yvalues1.append(data1[0])
     sql = "SELECT count(1) FROM airline " \
           "WHERE start_area like '%s' and end_area like '%s' and act_date like date_add('%s', interval 1 day) " \
-          "and Aprice > 1400" % (start_area, end_area, act_date)  # sql语句
+          "and price > 1600" % (start_area, end_area, act_date)  # sql语句
     # print(sql)
     cur.execute(sql)  # execute(query, args):执行单条sql语句。
     see2 = cur.fetchall()  # 使结果全部可看
@@ -216,12 +218,13 @@ def lose_rate_data():
     act_date = data['act_date']
     # print(start_area, end_area, act_date)
 
-    conn = pymysql.connect(host='127.0.0.1', user='root', password='', db='buggerexe')  # 建立数据库连接
+    conn = pymysql.connect(host=hosturl, user='root', password='', db=sqldb)  # 建立数据库连接
     cur = conn.cursor()
-    sql = "SELECT air_id, lose_rate FROM airline " \
+    sql = "SELECT air_id, round(AVG(late_rate),2) as lr FROM airline " \
           "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
-          "order by lose_rate desc limit 20" % (start_area, end_area, act_date)  # sql语句
-    print(sql)
+          "group by air_id " \
+          "order by lr desc limit 20" % (start_area, end_area, act_date)  # sql语句
+    # print(sql)
     cur.execute(sql)  # execute(query, args):执行单条sql语句。
     see = cur.fetchall()  # 使结果全部可看
     xaxis = []
@@ -251,13 +254,17 @@ def air_com_data():
     act_date = data['act_date']
     # print(start_area, end_area, act_date)
 
-    conn = pymysql.connect(host='127.0.0.1', user='root', password='', db='buggerexe')  # 建立数据库连接
+    conn = pymysql.connect(host=hosturl, user='root', password='', db=sqldb)  # 建立数据库连接
     cur = conn.cursor()
-    sql = "SELECT air_com, count(1) as acc FROM airline " \
+    sql = "SELECT name, count(1) as acc FROM airline " \
           "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
-          "group by air_com " \
-          "order by acc limit 15" % (start_area, end_area, act_date)  # sql语句
-    print(sql)
+          "group by name " \
+          "order by acc desc limit 6" % (start_area, end_area, act_date)  # sql语句
+    # sql = "SELECT cabin, count(1) as acc FROM airline " \
+    #       "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
+    #       "group by cabin " \
+    #       "order by acc limit 15" % (start_area, end_area, act_date)  # sql语句
+    # print(sql)
     cur.execute(sql)  # execute(query, args):执行单条sql语句。
     see = cur.fetchall()  # 使结果全部可看
     xaxis = []
@@ -287,13 +294,13 @@ def plane_type_data():
     act_date = data['act_date']
     # print(start_area, end_area, act_date)
 
-    conn = pymysql.connect(host='127.0.0.1', user='root', password='', db='buggerexe')  # 建立数据库连接
+    conn = pymysql.connect(host=hosturl, user='root', password='', db=sqldb)  # 建立数据库连接
     cur = conn.cursor()
-    sql = "SELECT plane_type, count(1) as acc FROM airline " \
+    sql = "SELECT type, count(1) as acc FROM airline " \
           "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
-          "group by plane_type " \
-          "order by acc limit 5" % (start_area, end_area, act_date)  # sql语句
-    print(sql)
+          "group by type " \
+          "order by acc desc limit 5" % (start_area, end_area, act_date)  # sql语句
+    # print(sql)
     cur.execute(sql)  # execute(query, args):执行单条sql语句。
     see = cur.fetchall()  # 使结果全部可看
     xaxis = []
@@ -308,7 +315,7 @@ def plane_type_data():
     sum = 0
     sql = "SELECT sum(1) FROM airline " \
           "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " % (start_area, end_area, act_date)  # sql语句
-    print(sql)
+    # print(sql)
     cur.execute(sql)  # execute(query, args):执行单条sql语句。
     see1 = cur.fetchall()
     for data in see1:
@@ -339,20 +346,20 @@ def around_price_data():
     yvalues1 = []
     yvalues2 = []
 
-    conn = pymysql.connect(host='127.0.0.1', user='root', password='', db='buggerexe')  # 建立数据库连接
+    conn = pymysql.connect(host=hosturl, user='root', password='', db=sqldb)  # 建立数据库连接
     cur = conn.cursor()
 
-    for i in range(0,2,1):
-        sql = "SELECT day(act_date), Aprice FROM airline " \
+    for i in range(0,7,1):
+        sql = "SELECT day(act_date), price FROM airline " \
               "WHERE start_area like '%s' and end_area like '%s' and act_date like date_add('%s', interval %d day) " \
-              "order by Aprice limit 1;" % (start_area, end_area, act_date, i)  # sql语句
-        print(sql)
+              "order by price limit 1;" % (start_area, end_area, act_date, i)  # sql语句
+        # print(sql)
         cur.execute(sql)  # execute(query, args):执行单条sql语句。
         see1 = cur.fetchall()  # 使结果全部可看
         for data1 in see1:
             xaxis.append(data1[0])
             yvalues1.append(data1[1])
-        sql = "SELECT avg(Aprice) FROM airline " \
+        sql = "SELECT avg(price) FROM airline " \
               "WHERE start_area like '%s' and end_area like '%s' and act_date like date_add('%s', interval %d day) " % (start_area, end_area, act_date, i)  # sql语句
         print(sql)
         cur.execute(sql)  # execute(query, args):执行单条sql语句。
