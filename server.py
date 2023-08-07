@@ -222,7 +222,7 @@ def lose_rate_data():
     sql = "SELECT air_id, round(AVG(late_rate),2) as lr FROM airline " \
           "WHERE start_area like '%s' and end_area like '%s' and act_date like '%s' " \
           "group by air_id " \
-          "order by lr desc limit 20" % (start_area, end_area, act_date)  # sql语句
+          "limit 20" % (start_area, end_area, act_date)  # sql语句
     # print(sql)
     cur.execute(sql)  # execute(query, args):执行单条sql语句。
     see = cur.fetchall()  # 使结果全部可看
